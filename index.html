@@ -45,6 +45,8 @@
 				document.addEventListener('drop', function(e){
 					cancelEvent(e);
 					console.log("dropped");
+					document.body.innerHTML = '';
+
 					for(var i=0;i<e.dataTransfer.files.length;++i){
 						var
 							file = e.dataTransfer.files[i]
@@ -56,7 +58,6 @@
 							reader = new FileReader()
 						;
 						reader.onload = function(e){
-							document.body.innerHTML = '';
 							midiFile = MidiFile(e.target.result);
 							console.log(midiFile);
 							parser = Parser(midiFile);
