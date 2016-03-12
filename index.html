@@ -45,7 +45,8 @@
 				document.addEventListener('drop', function(e){
 					cancelEvent(e);
 					console.log("dropped");
-					document.body.innerHTML = '';
+					//document.body.innerHTML = '';
+					document.getElementById('result').value = '';
 
 					for(var i=0;i<e.dataTransfer.files.length;++i){
 						var
@@ -72,7 +73,18 @@
 		</script>
 	</head>
 	<body>
+		<div>First, input shortest note length (in milliseconds): <input name="minimumPeriod" type="number" id="minimumPeriod" class="minimumPeriod" value="50"/> ms </div>
+		<div>Next, specify the maximum negligible period time (to get rid of unwanted silence periods. Any note with a period shorter than this won't get played) : <input name="negligible" type="number" id="negligible" class="minimumPeriod" value="5"/> ms </div>
 		
+		<br>
+		<div>Now drag and drop your file somewhere over this page.</div>
+		<br><br>
+		<div >
+				<textarea id="result" placeholder="result shows here..." style="width: 400px; height: 400px;">
+				</textarea>
+		</div>
+
+
 
 
 	</body>
