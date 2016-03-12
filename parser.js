@@ -48,6 +48,7 @@ function Parser(midiFile){
 			formatTrack.push({'startTime': minPeriod*l, 'note':[], 'volume': 0, 'duration': 1});
 		}
 
+		var errorFree = true;
 		for (var n = 0; n < trackNote.length; n++){
 			var tn = trackNote[n];
 			var formatIndex = Math.round(trackNote[n].startTime*1000/minPeriod);
@@ -61,15 +62,21 @@ function Parser(midiFile){
 																'octave': 2});
 							formatTrack[formatIndex + s].volume = 0;
 						} else {
-							formatTrack[formatIndex + s].note.push({'note': allNotes[tn.note[m].noteNumber % 12], 
+							try{
+								formatTrack[formatIndex + s].note.push({'note': allNotes[tn.note[m].noteNumber % 12], 
 																'octave': Math.floor(tn.note[m].noteNumber/12)});
-							formatTrack[formatIndex + s].volume = 1;
+								formatTrack[formatIndex + s].volume = 1;
+							} catch(err){
+								errorFree = false;	
+							}
 						}
 					}
 				}
 			}
 
 		}
+		
+		if (!errorFree){alert("An error occured. The results could possibly be messed up. Sorry!");}
 
 		for (var o = 0; o < formatTrack.length; o++){
 			formatTrack[o].note = formatTrack[o].note.slice(0,2);
