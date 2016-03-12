@@ -24,6 +24,87 @@ function Parser(midiFile){
 	var trackNote = [];
 	//trackNote = {'startTime': startTime, 'note': [{'noteNumber': noteNumber, 'duration': duration}]};
 
+	function formatDuration(trackNote){
+		var minPeriod = document.getElementById('minimumPeriod').value || 50;
+		var negligiblePeriod = document.getElementById('negligible').value || 5;
+
+		for (var i = 0; i < trackNote.length; i++){
+			if ((trackNote[i].note.length > 1) && (trackNote[i].note[0].noteNumber == 1000)){
+				trackNote[i].note = trackNote[i].note.slice(1,3);	
+			} else {
+				trackNote[i].note = trackNote[i].note.slice(0,2);
+			}
+			//if (trackNote[i].note.length < 2){
+			//	trackNote[i].note.push(trackNote[i].note[trackNote[i].note.length-1]);
+			//}
+		}
+
+		//return trackNote;
+
+		var maxTime = minPeriod * Math.round(trackNote[trackNote.length-1].startTime*1000/minPeriod);
+		var formatTrack = [];
+
+		for(var l = 0; l < maxTime/minPeriod; l++){
+			formatTrack.push({'startTime': minPeriod*l, 'note':[], 'volume': 0, 'duration': 1});
+		}
+
+		for (var n = 0; n < trackNote.length; n++){
+			var tn = trackNote[n];
+			var formatIndex = Math.round(trackNote[n].startTime*1000/minPeriod);
+
+			for(var m = 0; m < tn.note.length; m++){
+				if (tn.note[m].duration*1000 > negligiblePeriod) {
+					var dur = Math.round(tn.note[m].duration*1000/minPeriod);
+					for (var s = 0; s < dur; s++){
+						if (tn.note[m].noteNumber == 1000){
+							formatTrack[formatIndex + s].note.push({'note': 'c', 
+																'octave': 2});
+							formatTrack[formatIndex + s].volume = 0;
+						} else {
+							formatTrack[formatIndex + s].note.push({'note': allNotes[tn.note[m].noteNumber % 12], 
+																'octave': Math.floor(tn.note[m].noteNumber/12)});
+							formatTrack[formatIndex + s].volume = 1;
+						}
+					}
+				}
+			}
+
+		}
+
+		for (var o = 0; o < formatTrack.length; o++){
+			formatTrack[o].note = formatTrack[o].note.slice(0,2);
+			if (formatTrack[o].note.length == 0){
+				formatTrack[o].note.push({'note': 'c', 'octave': 2});
+			}
+			if (formatTrack[o].note.length < 2){
+				formatTrack[o].note.push(formatTrack[o].note[formatTrack[o].note.length-1]);
+			}
+		}
+
+		return formatTrack;
+	}
+
+	function groupTrack(trackNote){
+		var formatted = formatDuration(trackNote);
+		var grouped = [];
+
+		if (formatted.length > 0){
+			grouped.push(formatted[0]);
+			for(var i = 1; i < formatted.length; i++){
+				if ((formatted[i].note[0].note == grouped[grouped.length-1].note[0].note) &&
+					(formatted[i].note[0].octave == grouped[grouped.length-1].note[0].octave) &&
+					(formatted[i].note[1].note == grouped[grouped.length-1].note[1].note) &&
+					(formatted[i].note[1].octave == grouped[grouped.length-1].note[1].octave)){
+					grouped[grouped.length-1].duration += 1;
+				} else {
+					grouped.push(formatted[i]);
+				}
+			}
+		}
+
+		return grouped;
+	}
+
 	function handleEvent() {
 		getNextEvent();
 		var event = nextEventInfo.event;
@@ -102,7 +183,7 @@ function Parser(midiFile){
 		} catch(err) {
 			//console.log(trackNote);
 			
-			for (var m = 0; m < trackNote.length; m++) {
+			/*for (var m = 0; m < trackNote.length; m++) {
 				var el =  document.createElement("p")
 				el.id="title";
 				el.innerHTML = "Start Time: " + trackNote[m].startTime + "<br>";
@@ -119,14 +200,33 @@ function Parser(midiFile){
 					}
 				}
 				document.body.appendChild(el);
-			}
 
+			}*/
+			var grouped = groupTrack(trackNote);
+			//console.log(grouped);
+			for (var m = 0; m < grouped.length; m++){
+				var el =  document.createElement("p")
+				el.id="title";
+				el.innerHTML = "X ";
+				for(var n = 0; n < grouped[m].note.length ; n++){
+
+					el.innerHTML +=  grouped[m].note[n].note + " ";
+					var octVal = alphabets[grouped[m].note[n].octave];
+					el.innerHTML +=  octVal + " ";
+					
+				}
+
+				el.innerHTML +=  alphabets[grouped[m].duration-1 > 25? 25: grouped[m].duration-1] + " " + grouped[m].volume + "\n";
+				document.getElementById('result').value += el.innerHTML;
+			}
 			
 		}
+		
 
 	}
 
-	var allNotes = ['C', 'C#' , 'D' , 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A' , 'A#', 'B'];
+	var allNotes = ['c', 'C' , 'd' , 'D', 'e', 'f', 'F', 'g', 'G', 'a' , 'A', 'b'];
+	var alphabets = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
 	var nextEventInfo;
 	var samplesToNextEvent = 0;
