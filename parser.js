@@ -218,7 +218,7 @@ function Parser(midiFile){
 				for(var n = 0; n < grouped[m].note.length ; n++){
 
 					el.innerHTML +=  grouped[m].note[n].note + " ";
-					var octVal = alphabets[grouped[m].note[n].octave];
+					var octVal = alphabets[10 - grouped[m].note[n].octave];
 					el.innerHTML +=  octVal + " ";
 					
 				}
@@ -232,7 +232,7 @@ function Parser(midiFile){
 
 	}
 
-	var allNotes = ['c', 'C' , 'd' , 'D', 'e', 'f', 'F', 'g', 'G', 'a' , 'A', 'b'];
+	var allNotes = ['C', 'd', 'D', 'e', 'E', 'F', 'f', 'G', 'a', 'A', 'b', 'B'];
 	var alphabets = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
 	var nextEventInfo;
