@@ -4,6 +4,7 @@ function Parser(midiFile){
 	var beatsPerMinute = 120;
 	var ticksPerBeat = midiFile.header.ticksPerBeat;
 	var channelCount = 16;
+	var hiOctave = 0;
 	
 	for (var i = 0; i < midiFile.tracks.length; i++) {
 		trackStates[i] = {
@@ -65,6 +66,7 @@ function Parser(midiFile){
 							try{
 								formatTrack[formatIndex + s].note.push({'note': allNotes[tn.note[m].noteNumber % 12], 
 																'octave': Math.floor(tn.note[m].noteNumber/12)});
+								hiOctave = hiOctave < Math.floor(tn.note[m].noteNumber/12)? Math.floor(tn.note[m].noteNumber/12) : hiOctave;
 								formatTrack[formatIndex + s].volume = 1;
 							} catch(err){
 								errorFree = false;	
@@ -218,7 +220,7 @@ function Parser(midiFile){
 				for(var n = 0; n < grouped[m].note.length ; n++){
 
 					el.innerHTML +=  grouped[m].note[n].note + " ";
-					var octVal = alphabets[10 - grouped[m].note[n].octave];
+					var octVal = alphabets[10 - (grouped[m].note[n].octave + (10-hiOctave))];
 					el.innerHTML +=  octVal + " ";
 					
 				}
