@@ -218,7 +218,7 @@ function Parser(midiFile){
 				for(var n = 0; n < grouped[m].note.length ; n++){
 
 					el.innerHTML +=  grouped[m].note[n].note + " ";
-					var octVal = alphabets[grouped[m].note[n].octave];
+					var octVal = alphabets[10 - grouped[m].note[n].octave];
 					el.innerHTML +=  octVal + " ";
 					
 				}
